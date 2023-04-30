@@ -1,19 +1,16 @@
-#include <Wire.h> // This library allows you to communicate with I2C/TWI devices
-#include <Digital_Light_TSL2561.h> 
 
-int sda_pin = 0;  //Declaring the pin where the external LED will be connected
-int scl_pin = 2;  // Declaring the inbuilt LED for a similar action
-float value = 0;  // Declaring the intensity which will be outputted to the LEDs
 
-void setup() {
+void setupLDR() {
   // pinMode(pwmPin, OUTPUT);  //Specifyin the pin 6 as output 
+  Serial.begin(9600); //Initialising the serial monitor
+  Serial.println("Setting up the Light sensor");
   pinMode(LED_BUILTIN, OUTPUT);  //Specifying the pin 13 as output
-  Wire.begin(sda_pin,scl_pin);  //Initialising the wire library
-  Serial.begin(74880); //Initialising the serial monitor
+  Wire.begin(sda_pin_ldr,scl_pin_ldr);  //Initialising the wire library
   TSL2561.init();  //Initialising the light sensor
+  Serial.println("LDR sensor completed setting");
 }
 
-void loop() {
+void runLDR() {
   float lux = TSL2561.readVisibleLux();  //Reading the ambient light from the sensor to the pre-declared variable lux and printing it on the serial monitor
   Serial.print(" The ambient light level is: ");
   Serial.println(lux);
@@ -23,15 +20,13 @@ void loop() {
   {
    digitalWrite(LED_BUILTIN, LOW);
    
-   Serial.println("LED ON");
-   delay(1000);
+  //  Serial.println("LED ON");
+  //  delay(1000);
    
   }else{
    digitalWrite(LED_BUILTIN, HIGH);
+   Serial.println("LED OFF");
   }
-  
-
-  delay(300);
 }
 
 
