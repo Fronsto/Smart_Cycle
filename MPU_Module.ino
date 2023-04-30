@@ -7,6 +7,7 @@ void setupMPU(){
     delay(500);
   }
 
+  Serial.println("MPU connected!");
   mpu.setAccelPowerOnDelay(MPU6050_DELAY_3MS);
 
   mpu.setIntFreeFallEnabled(false);  
