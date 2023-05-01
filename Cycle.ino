@@ -8,16 +8,19 @@
 
 int sda_pin_ldr = D2; 
 int scl_pin_ldr = D1;
-int BUZZ_TIME = 10;
+int BUZZ_TIME = 100;
 
 MPU6050 mpu;
 int SCL_PIN=D1;
 int SDA_PIN=D2;
 int LED_PIN=D7;
+int LDR_LED = D3;
 int ALARM_PIN = D0;
 
 String lats = "";
 String longs = "";
+float lux;
+bool isLocked;
 
 TinyGPSPlus gps;  // The TinyGPS++ object
 SoftwareSerial ss(4, 5); // The serial connection to the GPS device
@@ -27,12 +30,12 @@ String date_str , time_str , lat_str , lng_str;
 int pm;
 // WiFiServer server(80);
 
-// const char* ssid = "Realme7";
-// const char* password = "poke1235";
-// const char* mqtt_server = "91.121.93.94";
-// const int mqtt_port = 1883;
-// WiFiClient espClient;
-// PubSubClient client(espClient);
+const char* ssid = "Realme7";
+const char* password = "poke1235";
+const char* mqtt_server = "91.121.93.94";
+const int mqtt_port = 1883;
+WiFiClient espClient;
+PubSubClient client(espClient);
 
 void setupGPS();
 void getGPSData();
@@ -42,6 +45,9 @@ void checkMPUSettings();
 
 void setupLDR();
 void runLDR();
+
+void setupMQTT();
+void reconnect();
 
 void setup() 
 {
@@ -55,25 +61,34 @@ void setup()
   digitalWrite(LED_PIN, LOW);
   digitalWrite(ALARM_PIN, LOW);
   setupLDR();
-  // setupMQTT();
+  setupMQTT();
   // setupGPS();
+  isLocked = true;
   Serial.println("setup done");
   
 }
 
 void loop()
 {
-  
-  runLDR();
-  digitalWrite(LED_PIN, HIGH);
+  Serial.println("Looping...");
+  // getGPSData();
+  if(isLocked == false)
+  {
+    runLDR();
+  }
+
+  // digitalWrite(LED_PIN, HIGH);
+  Vector normAccel = mpu.readNormalizeAccel();
   Activites act = mpu.readActivites();
-  if (act.isActivity)
+  if (act.isActivity && isLocked)
   {
     digitalWrite(LED_PIN, HIGH);
     digitalWrite(ALARM_PIN, HIGH);
-    Serial.println("*************ACTIVITY DETECTED*********");
-    // getGPSData();
+    Serial.println("*************ACTIVITY DETECTED while locked*********");
+     
+    // Serial.println(normAccel.XAxis);
     delay(BUZZ_TIME);
+    digitalWrite(ALARM_PIN, LOW);
     // Send gps data
     // sendGPSData();
   } 
@@ -82,21 +97,30 @@ void loop()
     digitalWrite(LED_PIN, LOW);
     digitalWrite(ALARM_PIN, LOW);
   }
-  // if(!client.connected()){
-  //   reconnect();
-  // }
+  if(!client.connected()){
+    reconnect();
+  }
 
 
   // sendGPSData();
   // lats = "abc";
   // longs = "abc";
-  // Serial.println("Sending MQTT data..");
-  // char buf[10];
-  // lats.toCharArray(buf, 6);
-  // client.publish("gunjan/gps", buf);
-  // longs.toCharArray(buf, 6);
-  // client.publish("gunjan/gps", buf);
-  delay(50);
+  Serial.println("Sending MQTT data..");
+  char buf[20];
+  dtostrf(latitude, 3, 6, buf);
+  client.publish("gunjan/latitude", buf);
+  dtostrf(longitude, 3, 6, buf);
+  client.publish("gunjan/longitude", buf);
+  dtostrf(normAccel.XAxis, 3, 6, buf);
+  client.publish("gunjan/accl_x", buf);
+  dtostrf(normAccel.YAxis, 3, 6, buf);
+  client.publish("gunjan/accl_y", buf);
+  dtostrf(normAccel.ZAxis, 3, 6, buf);
+  client.publish("gunjan/accl_z", buf);
+  dtostrf(lux, 3, 6, buf);
+  client.publish("gunjan/lux", buf);
+  delay(1000);
+  client.loop();
 }
 
 

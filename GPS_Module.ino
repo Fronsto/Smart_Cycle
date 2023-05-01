@@ -36,7 +36,7 @@ void getGPSData()
       lats = lat_str;
       longs = lng_str;
 
-      Serial.println("lat: ");
+      Serial.println("latitude: ");
       Serial.println(lat_str);
       Serial.println("longitude: ");
       Serial.println(lng_str);
