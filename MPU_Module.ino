@@ -1,3 +1,5 @@
+
+// setup the MPU6050 sensor
 void setupMPU()
 {
   Serial.println("Initialize MPU6050");
@@ -9,6 +11,8 @@ void setupMPU()
   }
 
   Serial.println("MPU connected!");
+
+  // Configure the MPU6050 sensor
   mpu.setAccelPowerOnDelay(MPU6050_DELAY_3MS);
 
   mpu.setIntFreeFallEnabled(false);
@@ -23,6 +27,8 @@ void setupMPU()
   mpu.setZeroMotionDetectionThreshold(4);
   mpu.setZeroMotionDetectionDuration(2);
 }
+
+// Function to check if the MPU is working properly
 void checkMPUSettings()
 {
   Serial.println();

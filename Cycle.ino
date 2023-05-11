@@ -84,8 +84,6 @@ void loop()
     Serial.println("*************ACTIVITY DETECTED while locked*********");
     delay(BUZZ_TIME);
     digitalWrite(ALARM_PIN, LOW);
-    // Send gps data
-    // sendGPSData();
   }
   else
   {
