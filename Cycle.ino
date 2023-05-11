@@ -13,7 +13,6 @@ int BUZZ_TIME = 100;  // time for which buzzer will buzz
 MPU6050 mpu;        // The MPU6050 object
 int SCL_PIN = D1;   // SCL pin for MPU6050
 int SDA_PIN = D2;   // SDA pin for MPU6050
-int LED_PIN = D7;   // LED pin for the tailight
 int LDR_LED = D3;   // LED pin for the headlight
 int ALARM_PIN = D0; // Buzzer pin
 
@@ -55,10 +54,9 @@ void setup()
   setupMPU();
   checkMPUSettings();
 
-  pinMode(LED_PIN, OUTPUT);
   pinMode(ALARM_PIN, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
   digitalWrite(ALARM_PIN, LOW);
+
   setupLDR();
   setupMQTT();
   // setupGPS();
@@ -70,24 +68,26 @@ void loop()
 {
   Serial.println("Looping...");
   // getGPSData();
+
+  char buf[20]; // buffer to store the data to be sent over MQTT
   if (isLocked == false)
   {
     runLDR();
+    dtostrf(lux, 3, 6, buf);
+    client.publish("gunjan/lux", buf); // send ambient light values if the cycle is unlocked
   }
 
   Vector normAccel = mpu.readNormalizeAccel();
   Activites act = mpu.readActivites();
   if (act.isActivity && isLocked)
-  {
-    digitalWrite(LED_PIN, HIGH);
-    digitalWrite(ALARM_PIN, HIGH);
+  { 
     Serial.println("*************ACTIVITY DETECTED while locked*********");
+    digitalWrite(ALARM_PIN, HIGH);
     delay(BUZZ_TIME);
     digitalWrite(ALARM_PIN, LOW);
   }
   else
   {
-    digitalWrite(LED_PIN, LOW);
     digitalWrite(ALARM_PIN, LOW);
   }
   if (!client.connected())
@@ -107,8 +107,7 @@ void loop()
   client.publish("gunjan/accl_y", buf);
   dtostrf(normAccel.ZAxis, 3, 6, buf);
   client.publish("gunjan/accl_z", buf);
-  dtostrf(lux, 3, 6, buf);
-  client.publish("gunjan/lux", buf);
+  client.publish("gunjan/alive", "1");
   delay(1000);
   client.loop();
 }

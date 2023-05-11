@@ -2,7 +2,6 @@
 
 void setupLDR()
 {
-  Serial.begin(9600); // Initialising the serial monitor
   Serial.println("Setting up the Light sensor");
   pinMode(LDR_LED, OUTPUT);             // Specifying the pin 13 as output
   Wire.begin(sda_pin_ldr, scl_pin_ldr); // Initialising the wire library

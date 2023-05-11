@@ -9,15 +9,23 @@ void setupMQTT()
     Serial.println("Connecting to WiFi..");
   }
   Serial.print("Connected to WiFi :");
+  digitalWrite(ALARM_PIN, HIGH);
+  delay(30);
+  digitalWrite(ALARM_PIN, LOW);
+
   Serial.println(WiFi.SSID());
   client.setServer(mqtt_server, mqtt_port); // Connect to MQTT Broker
-  client.setCallback(MQTTcallback);        // Set callback function for MQTT client
+  client.setCallback(MQTTcallback);
+          // Set callback function for MQTT client
   while (!client.connected())
   {
     Serial.println("Connecting to MQTT...");
     if (client.connect("ESP8266"))
     {
       Serial.println("connected");
+      digitalWrite(ALARM_PIN, HIGH);
+      delay(30);
+      digitalWrite(ALARM_PIN, LOW);
     }
     else
     {
@@ -57,12 +65,22 @@ void MQTTcallback(char *topic, byte *payload, unsigned int length)
     Serial.println("Cycle is locked!");
     isLocked = true;
     lock();
+    digitalWrite(ALARM_PIN, HIGH);
+    delay(40);
+    digitalWrite(ALARM_PIN, LOW);
   }
   // if the message is "unlock", then unlock the cycle
   else if (message == "unlock")
   {
     Serial.println("Cycle is unlocked!");
     isLocked = false;
+    digitalWrite(ALARM_PIN, HIGH);
+    delay(30);
+    digitalWrite(ALARM_PIN, LOW);
+    delay(80);
+    digitalWrite(ALARM_PIN, HIGH);
+    delay(30);
+    digitalWrite(ALARM_PIN, LOW);
   }
   Serial.println();
   Serial.println("-----------------------");
@@ -77,6 +95,9 @@ void reconnect()
     if (client.connect("ESP8266"))
     {
       Serial.println("Connected");
+      digitalWrite(ALARM_PIN, HIGH);
+      delay(30);
+      digitalWrite(ALARM_PIN, LOW);
     }
     else
     {
