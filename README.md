@@ -13,3 +13,5 @@
 - `light_sensor.ino`: The code is to setup the Grove Digital Light Sensor using the TSL2561 library. The `runLDR()` function reads the Ambient Light value in lux and if it falls below a certain threshold (here, 500 lux) then it turns on the LED connected to the headlight of the cycle. When the ambient light is above that threshold, it turns that LED back off.
 - `ESP8266_MPU6050-master.zip`: This library is used to interface the MPU6050 sensor with the IDE.
 - `TinyGPSPlus-1.0.2.zip`: This library is used to interface the GPU sensor and interpret the GPS values.
+
+### You can find the code for the companion app built in Flutter [here](https://github.com/GunjanDhanuka/smart-cycle-app).
